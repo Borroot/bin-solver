@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
+# Fill in your path to the samples folder and the name of your program solver.
 SAMPLES_PATH="samples"
+PROGRAM="solver" # only works for cpp so far
 
+# Default time-out time is 5s give argument to the tester if you want longer e.g. ./tester 10 if you want a 10 seconds time-out.
 [ -z "$1" ] && max_time="5" || max_time="$1"
 
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+GREEN='\e[32m'
+RED='\e[31m'
+NC='\e[0m' # No Color
 
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
@@ -16,8 +20,13 @@ do
 	answer_file="$(echo "${input}" | sed -r 's/in/out/g')"
 	answer="$(cat < ${answer_file})"
 
-	output="$(timeout ${max_time} ./solver < ${input})"
-	[[ "${output}" == "" ]] && output="${RED}TIME-OUT${NC}"
+	output="$(timeout ${max_time} ./${PROGRAM} < ${input})"
+	[[ "${output}" == "" ]] && output="TIME-OUT"
 
-	echo -e "${input}\t${output}\t${answer}"
+	if [[ "${output}" == "${answer}" ]]
+	then
+		echo -e "${input}\t${GREEN}${output}${NC}\t${answer}"
+	else
+		echo -e "${input}\t${RED}${output}\t${NC}${answer}"
+	fi
 done
