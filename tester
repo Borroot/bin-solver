@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+echo -e "File\t\t\tOutput\t\tAnswer"
+for input in $(ls samples/*.in) 
+do
+	answer_file="$(echo "${input}" | sed -r 's/in/out/g')"
+	answer="$(cat < ${answer_file})"
+	output="$(./solver < ${input})"
+
+	echo -e "${input}\t${output}\t${answer}"
+done
