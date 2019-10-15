@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# AUTHOR: Bram Pulles
 
-# Fill in your path to the samples folder and the name of your program solver.
+# TODO Show running time for each input.
+# Fill in your path to the samples folder and the name of your solver.
 SAMPLES_PATH="samples"
 PROGRAM="solver" # only works for cpp so far
 
