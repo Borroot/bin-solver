@@ -9,30 +9,17 @@ struct V {
 	vector<int> neighbors;
 };
 
-bool operator== (V vector1, int vector2) {
-	return vector1.label == vector2;
+bool operator== (V vector, int label) {
+	return vector.label == label;
 }
 
-bool operator== (int vector1, V vector2) {
-	return vector1 == vector2.label;
+bool operator== (int label, V vector) {
+	return label == vector.label;
 }
 
 bool operator== (V vector1, V vector2) {
 	return vector1.label == vector2.label;
 }
-
-//template <typename T>
-//ostream& operator<< (ostream &out, vector<T> graph) {
-	//cout << "{";
-	//for (int i = 0; i < graph.size(); i++) {
-		//cout << graph[i];
-		//if (i != graph.size() - 1) {
-			//cout << ", ";
-		//}
-	//}
-	//cout << "}" << endl;
-	//return out;
-//}
 
 vector<V> init_vectors (const int V_SIZE, const int E_SIZE) {
 	vector<V> vertices;
@@ -54,16 +41,16 @@ vector<V> init_vectors (const int V_SIZE, const int E_SIZE) {
 	return vertices;
 }
 
-void remove_by_value (vector<V> &vs, int v) {
-	vs.erase(remove(vs.begin(), vs.end(), v), vs.end());
+void remove_by_label (vector<V> &vertices, int label) {
+	vertices.erase(remove(vertices.begin(), vertices.end(), label), vertices.end());
 }
 
 vector<V> create_next_vertices (vector<V> &vertices, V current) {
 	vector<V> next_vertices(vertices);	
-	remove_by_value(next_vertices, current.label);
+	remove_by_label(next_vertices, current.label);
 
 	for (int i = 0; i < current.neighbors.size(); i++) {
-		remove_by_value(next_vertices, current.neighbors[i]);
+		remove_by_label(next_vertices, current.neighbors[i]);
 	}
 
 	return next_vertices;
@@ -83,8 +70,6 @@ bool DFS_sequential_search (vector<V> vertices, int bins_placed, const int &B_SI
 			return true;
 		}
 	}		
-	bins_placed--;
-
 	return false;
 }
 
