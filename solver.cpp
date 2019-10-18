@@ -13,14 +13,6 @@ bool operator== (V vector, int label) {
 	return vector.label == label;
 }
 
-bool operator== (int label, V vector) {
-	return label == vector.label;
-}
-
-bool operator== (V vector1, V vector2) {
-	return vector1.label == vector2.label;
-}
-
 vector<V> init_vectors (const int V_SIZE, const int E_SIZE) {
 	vector<V> vertices;
 

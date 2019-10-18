@@ -6,8 +6,8 @@
 SAMPLES_PATH="samples"
 PROGRAM="solver" # only works for cpp so far
 
-# Default time-out time is 3s give argument to the tester if you want longer e.g. ./tester 10 if you want a 10 seconds time-out.
-[ -z "$1" ] && max_time="3" || max_time="$1"
+# Default time-out time is 1s give argument to the tester if you want longer e.g. ./tester 10 if you want a 10 seconds time-out.
+[ -z "$1" ] && max_time="1" || max_time="$1"
 
 GREEN='\e[32m'
 RED='\e[31m'
