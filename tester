@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # AUTHOR: Bram Pulles
 
-# TODO Show running time for each input.
 # Fill in your path to the samples folder and the name of your solver.
 SAMPLES_PATH="samples"
 PROGRAM="solver" # only works for cpp so far
@@ -16,19 +15,28 @@ NC='\e[0m' # No Color
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
-echo -e "${BOLD}INPUT\t\t\tOUTPUT\t\tANSWER${NORMAL}"
+echo -e "${BOLD}INPUT\t\t\tOUTPUT\t\tANSWER\t\tTIME (s)${NORMAL}"
 for input in $(ls ${SAMPLES_PATH}/*.in) 
 do
 	answer_file="$(echo "${input}" | sed -r 's/in/out/g')"
 	answer="$(cat < ${answer_file})"
 
-	output="$(timeout ${max_time} ./${PROGRAM} < ${input})"
+	output="`( time timeout ${max_time} ./${PROGRAM} < ${input} ) 2> temp_time_result`"
 	[[ "${output}" == "" ]] && output="TIME-OUT"
+
+	time="$(cat temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
 
 	if [[ "${output}" == "${answer}" ]]
 	then
-		echo -e "${input}\t${GREEN}${output}${NC}\t${answer}"
+		echo -e "${input}\t${GREEN}${output}${NC}\t${answer}\t${time}"
 	else
-		echo -e "${input}\t${RED}${output}\t${NC}${answer}"
+		if (( $(awk 'BEGIN {print ("'${time}'" >= "'${max_time}'")}') ))
+		then
+			echo -e "${input}\t${RED}${output}\t${NC}${answer}\t${RED}${time}${NC}"
+		else
+			echo -e "${input}\t${RED}${output}\t${NC}${answer}\t${time}"
+		fi
 	fi
 done
+
+rm temp_time_result
