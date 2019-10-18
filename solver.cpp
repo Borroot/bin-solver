@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -7,6 +8,14 @@ struct V {
 	int label;
 	vector<int> neighbors;
 };
+
+bool operator== (V vector1, int vector2) {
+	return vector1.label == vector2;
+}
+
+bool operator== (int vector1, V vector2) {
+	return vector1 == vector2.label;
+}
 
 bool operator== (V vector1, V vector2) {
 	return vector1.label == vector2.label;
@@ -45,45 +54,34 @@ vector<V> init_vectors (const int V_SIZE, const int E_SIZE) {
 	return vertices;
 }
 
-vector<V> copy (vector<V> original) {
-	vector<V> copy;
-
-	for (int i = 0; i < original.size(); i++) {
-		copy.push_back(original[i]);
-	}
-	return copy;
+void remove_by_value (vector<V> &vs, int v) {
+	vs.erase(remove(vs.begin(), vs.end(), v), vs.end());
 }
 
-void remove_neighbors (vector<V> &vertices, vector<int> &to_be_removed) {
-	for (int i = 0; i < to_be_removed.size(); i++) {
-		for (int j = 0; j < vertices.size(); j++) {
-			if (to_be_removed[i] == vertices[j].label) {
-				vertices.erase(vertices.begin() + j);
-			}
-		}
+vector<V> create_next_vertices (vector<V> &vertices, V current) {
+	vector<V> next_vertices(vertices);	
+	remove_by_value(next_vertices, current.label);
+
+	for (int i = 0; i < current.neighbors.size(); i++) {
+		remove_by_value(next_vertices, current.neighbors[i]);
 	}
+
+	return next_vertices;
 }
 
-bool DFS_sequential_search (vector<V> &vertices_left, int bins_placed, const int &B_SIZE) {
+bool DFS_sequential_search (vector<V> vertices, int bins_placed, const int &B_SIZE) {
 	if (bins_placed >= B_SIZE) {
 		return true;
 	}
 		
 	bins_placed++;
-	for (int i = 0; i < vertices_left.size(); i++) {
-		V current = vertices_left[i];
+	for (int i = 0; i < vertices.size(); i++) {
+		V current = vertices[i];
+		vector<V> next_vertices = create_next_vertices(vertices, current);
 
-		vertices_left.erase(vertices_left.begin() + i);
-
-		vector<V> vertices_left_copy = copy(vertices_left);
-		remove_neighbors(vertices_left, current.neighbors);
-
-		if (DFS_sequential_search(vertices_left, bins_placed, B_SIZE)) {
+		if (DFS_sequential_search(next_vertices, bins_placed, B_SIZE)) {
 			return true;
 		}
-
-		vertices_left = vertices_left_copy;
-		vertices_left.insert(vertices_left.begin() + i, current);
 	}		
 	bins_placed--;
 
