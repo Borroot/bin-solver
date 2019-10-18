@@ -15,7 +15,7 @@ NC='\e[0m' # No Color
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
-echo -e "${BOLD}INPUT\t\t\tOUTPUT\t\tANSWER\t\tTIME (s)${NORMAL}"
+echo -e "${BOLD}INPUT\t\tOUTPUT\t\tANSWER\t\tTIME (s)${NORMAL}"
 for input in $(ls ${SAMPLES_PATH}/*.in) 
 do
 	answer_file="$(echo "${input}" | sed -r 's/in/out/g')"
@@ -25,16 +25,17 @@ do
 	[[ "${output}" == "" ]] && output="TIME-OUT"
 
 	time="$(cat temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
+	input_file="$(echo "${input}" | sed 's/.*\///')"
 
 	if [[ "${output}" == "${answer}" ]]
 	then
-		echo -e "${input}\t${GREEN}${output}${NC}\t${answer}\t${time}"
+		echo -e "${input_file}\t${GREEN}${output}${NC}\t${answer}\t${time}"
 	else
 		if (( $(awk 'BEGIN {print ("'${time}'" >= "'${max_time}'")}') ))
 		then
-			echo -e "${input}\t${RED}${output}\t${NC}${answer}\t${RED}${time}${NC}"
+			echo -e "${input_file}\t${RED}${output}\t${NC}${answer}\t${RED}${time}${NC}"
 		else
-			echo -e "${input}\t${RED}${output}\t${NC}${answer}\t${time}"
+			echo -e "${input_file}\t${RED}${output}\t${NC}${answer}\t${time}"
 		fi
 	fi
 done
