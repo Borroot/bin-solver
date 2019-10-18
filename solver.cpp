@@ -3,48 +3,46 @@
 
 using namespace std;
 
-typedef int V;
-
-struct E {
-	V v1, v2;	
+struct V {
+	int label;
+	vector<int> neighbors;
 };
 
-ostream& operator<< (ostream &out, E edge) {
-	cout << "[" << edge.v1 << "," << edge.v2 << "]";
-	return out;
+bool operator== (V vector1, V vector2) {
+	return vector1.label == vector2.label;
 }
 
-template <typename T>
-ostream& operator<< (ostream &out, vector<T> graph) {
-	cout << "{";
-	for (int i = 0; i < graph.size(); i++) {
-		cout << graph[i];
-		if (i != graph.size() - 1) {
-			cout << ", ";
-		}
-	}
-	cout << "}" << endl;
-	return out;
-}
+//template <typename T>
+//ostream& operator<< (ostream &out, vector<T> graph) {
+	//cout << "{";
+	//for (int i = 0; i < graph.size(); i++) {
+		//cout << graph[i];
+		//if (i != graph.size() - 1) {
+			//cout << ", ";
+		//}
+	//}
+	//cout << "}" << endl;
+	//return out;
+//}
 
-vector<V> init_vectors (const int V_SIZE) {
+vector<V> init_vectors (const int V_SIZE, const int E_SIZE) {
 	vector<V> vertices;
-	for (int i = 0; i < V_SIZE; i++) {
-		vertices.push_back(i+1);
-	}
-	return vertices;
-}
 
-vector<E> init_edges (const int E_SIZE) {
-	vector<E> edges;
+	// Initialize vertices list.
+	for (int i = 0; i < V_SIZE; i++) {
+		vertices.push_back({i+1, {}});
+	}
+
+	// Add neighbors to vertices.
 	for (int i = 0; i < E_SIZE; i++) {
 		int v1, v2;
 		cin >> v1;
 		cin >> v2;
-		E edge = {v1, v2};
-		edges.push_back(edge);
+		vertices[v1-1].neighbors.push_back(v2);
+		vertices[v2-1].neighbors.push_back(v1);
 	}
-	return edges;
+
+	return vertices;
 }
 
 vector<V> copy (vector<V> original) {
@@ -56,54 +54,38 @@ vector<V> copy (vector<V> original) {
 	return copy;
 }
 
-vector<V> search_neighbors (vector<E> &edges, vector<V> &vertices_left, V vertex) {
-	vector<V> neighbors;
-
-	for (int i = 0; i < edges.size(); i++) {
-		if (edges[i].v1 == vertex) {
-			neighbors.push_back(edges[i].v2);
-		} else if (edges[i].v2 == vertex) {
-			neighbors.push_back(edges[i].v1);
-		}
-	}
-	return neighbors;
-}
-
-void remove_neighbors (vector<V> &vertices, vector<V> &to_be_removed) {
+void remove_neighbors (vector<V> &vertices, vector<int> &to_be_removed) {
 	for (int i = 0; i < to_be_removed.size(); i++) {
 		for (int j = 0; j < vertices.size(); j++) {
-			if (to_be_removed[i] == vertices[j]) {
+			if (to_be_removed[i] == vertices[j].label) {
 				vertices.erase(vertices.begin() + j);
 			}
 		}
 	}
 }
 
-bool DFS_sequential_search (vector<E> &edges, vector<V> &vertices_left, vector<V> &vertices_chosen, const int &B_SIZE) {
-	if (vertices_chosen.size() >= B_SIZE) {
+bool DFS_sequential_search (vector<V> &vertices_left, int bins_placed, const int &B_SIZE) {
+	if (bins_placed >= B_SIZE) {
 		return true;
 	}
 		
+	bins_placed++;
 	for (int i = 0; i < vertices_left.size(); i++) {
-		V current_vertex = vertices_left[i];
+		V current = vertices_left[i];
 
 		vertices_left.erase(vertices_left.begin() + i);
-		vertices_chosen.push_back(current_vertex);
-
-		vector<V> neighbors = search_neighbors(edges, vertices_left, current_vertex);
 
 		vector<V> vertices_left_copy = copy(vertices_left);
-		remove_neighbors(vertices_left, neighbors);
+		remove_neighbors(vertices_left, current.neighbors);
 
-		if (DFS_sequential_search(edges, vertices_left, vertices_chosen, B_SIZE)) {
+		if (DFS_sequential_search(vertices_left, bins_placed, B_SIZE)) {
 			return true;
 		}
 
 		vertices_left = vertices_left_copy;
-		
-		vertices_chosen.pop_back();
-		vertices_left.insert(vertices_left.begin() + i, current_vertex);
+		vertices_left.insert(vertices_left.begin() + i, current);
 	}		
+	bins_placed--;
 
 	return false;
 }
@@ -115,11 +97,9 @@ int main () {
 	cin >> V_SIZE;
 	cin >> B_SIZE;
 
-	vector<E> edges    = init_edges(E_SIZE);
-	vector<V> vertices = init_vectors(V_SIZE);
+	vector<V> vertices = init_vectors(V_SIZE, E_SIZE);
 
-	vector<V> chosen = {};
-	bool result = DFS_sequential_search(edges, vertices, chosen, B_SIZE);
+	bool result = DFS_sequential_search(vertices, 0, B_SIZE);
 	cout << (result ? "possible" : "impossible") << endl;
 
 	return 0;
