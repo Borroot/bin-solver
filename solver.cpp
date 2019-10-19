@@ -1,6 +1,8 @@
-#include <algorithm>
 #include <iostream>
 #include <vector>
+#include <functional>
+#include <algorithm>
+#include <bits/stdc++.h> 
 
 using namespace std;
 
@@ -9,11 +11,44 @@ struct V {
 	vector<int> neighbors;
 };
 
-bool operator== (V vector, int label) {
+struct State {
+	int current;
+	vector<int> vertices;
+	vector<int> chosen;
+};
+
+bool operator== (const V &vector, const int label) {
 	return vector.label == label;
 }
 
-vector<V> init_vectors (const int V_SIZE, const int E_SIZE) {
+bool operator== (const State &state1, const State &state2) {
+	return state1.current == state2.current && state1.vertices == state2.vertices && state1.chosen == state2.chosen;	
+}
+
+namespace std {
+	template<> struct hash<vector<int>> {
+		size_t operator() (const vector<int> &vec) const noexcept {
+			size_t seed = vec.size();
+			for(auto& i : vec) {
+				seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			}
+			return seed;
+		}
+	};
+}
+
+namespace std {
+	template<> struct hash<State> {
+		size_t operator() (const State &state) const noexcept {
+			size_t h1 = hash<int>()(state.current);
+			size_t h2 = hash<vector<int>>()(state.vertices);
+			size_t h3 = hash<vector<int>>()(state.chosen);
+			return h1 ^ h2 ^ h3;
+		}
+	};
+}
+
+vector<V> init_vectors (const int &V_SIZE, const int &E_SIZE) {
 	vector<V> vertices;
 
 	// Initialize vertices list.
@@ -48,33 +83,55 @@ vector<V> create_next_vertices (vector<V> &vertices, V current) {
 	return next_vertices;
 }
 
-bool DFS_sequential_search (vector<V> vertices, int bins_placed, const int &B_SIZE) {
-	if (bins_placed >= B_SIZE) {
+vector<int> labels (vector<V> vertices) {
+	vector<int> labels_vertices;
+
+	for (int i = 0; i < vertices.size(); i++) {
+		labels_vertices.push_back(vertices[i].label);
+	}
+	return labels_vertices;
+}
+
+State create_state (V &current, vector<V> &vertices, vector<V> &chosen) {
+	State state = {current.label, labels(vertices), labels(chosen)}; 
+	return state; 
+}
+
+bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, unordered_set<State> &states, const int &BIN_GOAL) {
+	if (chosen.size() >= BIN_GOAL) {
 		return true;
 	}
 		
-	bins_placed++;
 	for (int i = 0; i < vertices.size(); i++) {
 		V current = vertices[i];
+		chosen.push_back(current);
 		vector<V> next_vertices = create_next_vertices(vertices, current);
 
-		if (DFS_sequential_search(next_vertices, bins_placed, B_SIZE)) {
-			return true;
-		}
+		State state = create_state(current, next_vertices, chosen);
+		if (states.find(state) == states.end()) {
+			states.insert(state);
+
+			if (DFS_sequential_search(next_vertices, chosen, states, BIN_GOAL)) {
+				return true;
+			}
+		} 
+		chosen.pop_back();
 	}		
 	return false;
 }
 
 int main () {
 
-	int E_SIZE, V_SIZE, B_SIZE;
+	int E_SIZE, V_SIZE, BIN_GOAL;
 	cin >> E_SIZE;
 	cin >> V_SIZE;
-	cin >> B_SIZE;
+	cin >> BIN_GOAL;
 
 	vector<V> vertices = init_vectors(V_SIZE, E_SIZE);
+	vector<V> chosen;
+	unordered_set<State> states;
 
-	bool result = DFS_sequential_search(vertices, 0, B_SIZE);
+	bool result = DFS_sequential_search(vertices, chosen, states, BIN_GOAL);
 	cout << (result ? "possible" : "impossible") << endl;
 
 	return 0;
