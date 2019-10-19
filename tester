@@ -22,7 +22,7 @@ do
 	answer="$(cat < ${answer_file})"
 
 	output="`( time timeout ${max_time} ./${PROGRAM} < ${input} ) 2> temp_time_result`"
-	[[ "${output}" == "" ]] && output="TIME-OUT"
+	[[ "${output}" == "" ]] && output="ERROR"
 
 	time="$(cat temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
 	input_file="$(echo "${input}" | sed 's/.*\///')"
@@ -33,6 +33,7 @@ do
 	else
 		if (( $(awk 'BEGIN {print ("'${time}'" >= "'${max_time}'")}') ))
 		then
+			output="TIME-OUT"
 			echo -e "${input_file}\t${RED}${output}\t${NC}${answer}\t${RED}${time}${NC}"
 		else
 			echo -e "${input_file}\t${RED}${output}\t${NC}${answer}\t${time}"
