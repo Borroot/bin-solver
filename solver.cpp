@@ -6,8 +6,6 @@
 
 using namespace std;
 
-int pruned = 0;
-
 struct V {
 	int label;
 	vector<int> neighbors;
@@ -121,9 +119,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<int> &chosen, unordered_s
 			if (DFS_sequential_search(next_vertices, chosen, states, BIN_GOAL)) {
 				return true;
 			}
-		} else {
-			pruned++;
-		}
+		} 
 		chosen.pop_back();
 	}		
 	return false;
@@ -141,7 +137,7 @@ int main () {
 	unordered_set<State> states;
 
 	bool result = DFS_sequential_search(vertices, chosen, states, BIN_GOAL);
-	cout << (result ? "possible" : "impossible") << " " << pruned << endl;
+	cout << (result ? "possible" : "impossible") << endl;
 
 	return 0;
 }
