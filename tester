@@ -22,7 +22,7 @@ do
 	answer="$(cat < ${answer_file})"
 
 	output="`( time timeout ${max_time} ./${PROGRAM} < ${input} ) 2> temp_time_result`"
-	[[ "${output}" == "" ]] && output="ERROR"
+	[[ "${output}" == "" ]] && output="ERROR\n"
 
 	time="$(cat temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
 	input_file="$(echo "${input}" | sed 's/.*\///')"

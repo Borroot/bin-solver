@@ -6,6 +6,8 @@
 
 using namespace std;
 
+int pruned = 0;
+
 struct V {
 	int label;
 	vector<int> neighbors;
@@ -92,19 +94,24 @@ vector<int> labels (vector<V> vertices) {
 	return labels_vertices;
 }
 
-State create_state (V &current, vector<V> &vertices, vector<V> &chosen) {
-	State state = {current.label, labels(vertices), labels(chosen)}; 
+State create_state (V &current, vector<V> &vertices, vector<int> &chosen) {
+	State state = {current.label, labels(vertices), chosen}; 
 	return state; 
 }
 
-bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, unordered_set<State> &states, const int &BIN_GOAL) {
+void insert(vector<int> &vertices, int vertex) {
+	vector<int>::iterator it = lower_bound(vertices.begin(), vertices.end(), vertex, greater<int>()); 
+	vertices.insert(it, vertex); 
+}
+
+bool DFS_sequential_search (vector<V> vertices, vector<int> &chosen, unordered_set<State> &states, const int &BIN_GOAL) {
 	if (chosen.size() >= BIN_GOAL) {
 		return true;
 	}
 		
 	for (int i = 0; i < vertices.size(); i++) {
 		V current = vertices[i];
-		chosen.push_back(current);
+		insert(chosen, current.label);
 		vector<V> next_vertices = create_next_vertices(vertices, current);
 
 		State state = create_state(current, next_vertices, chosen);
@@ -114,7 +121,9 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, unordered_set
 			if (DFS_sequential_search(next_vertices, chosen, states, BIN_GOAL)) {
 				return true;
 			}
-		} 
+		} else {
+			pruned++;
+		}
 		chosen.pop_back();
 	}		
 	return false;
@@ -128,11 +137,11 @@ int main () {
 	cin >> BIN_GOAL;
 
 	vector<V> vertices = init_vectors(V_SIZE, E_SIZE);
-	vector<V> chosen;
+	vector<int> chosen;
 	unordered_set<State> states;
 
 	bool result = DFS_sequential_search(vertices, chosen, states, BIN_GOAL);
-	cout << (result ? "possible" : "impossible") << endl;
+	cout << (result ? "possible" : "impossible") << " " << pruned << endl;
 
 	return 0;
 }
