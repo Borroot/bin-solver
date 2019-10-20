@@ -9,9 +9,9 @@ using namespace std;
 typedef int V;
 
 struct State {
-	int current;
-	vector<int> vertices;
-	vector<int> chosen;
+	V current;
+	vector<V> vertices;
+	vector<V> chosen;
 };
 
 bool operator== (const State &state1, const State &state2) {
@@ -19,8 +19,8 @@ bool operator== (const State &state1, const State &state2) {
 }
 
 namespace std {
-	template<> struct hash<vector<int>> {
-		size_t operator() (const vector<int> &vec) const noexcept {
+	template<> struct hash<vector<V>> {
+		size_t operator() (const vector<V> &vec) const noexcept {
 			size_t seed = vec.size();
 			for(auto& i : vec) {
 				seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
@@ -33,9 +33,9 @@ namespace std {
 namespace std {
 	template<> struct hash<State> {
 		size_t operator() (const State &state) const noexcept {
-			size_t h1 = hash<int>()(state.current);
-			size_t h2 = hash<vector<int>>()(state.vertices);
-			size_t h3 = hash<vector<int>>()(state.chosen);
+			size_t h1 = hash<V>()(state.current);
+			size_t h2 = hash<vector<V>>()(state.vertices);
+			size_t h3 = hash<vector<V>>()(state.chosen);
 			return h1 ^ h2 ^ h3;
 		}
 	};
@@ -58,27 +58,26 @@ void init_vectors (vector<V> &vertices, vector<vector<V>> &neighbors, const int 
 	}
 }
 
-void remove_by_label (vector<V> &vertices, int label) {
-	vertices.erase(remove(vertices.begin(), vertices.end(), label), vertices.end());
+void remove_vertex (vector<V> &vertices, V vertex) {
+	vertices.erase(remove(vertices.begin(), vertices.end(), vertex), vertices.end());
 }
 
 vector<V> create_next_vertices (vector<V> &vertices, vector<vector<V>> &neighbors, V current) {
 	vector<V> next_vertices(vertices);	
-	remove_by_label(next_vertices, current);
+	remove_vertex(next_vertices, current);
 
 	for (int i = 0; i < neighbors[current].size(); i++) {
-		remove_by_label(next_vertices, neighbors[current][i]);
+		remove_vertex(next_vertices, neighbors[current][i]);
 	}
-
 	return next_vertices;
 }
 
-void insert(vector<int> &vertices, int vertex) {
-	vector<int>::iterator it = lower_bound(vertices.begin(), vertices.end(), vertex, greater<int>()); 
+void insert(vector<V> &vertices, V vertex) {
+	vector<V>::iterator it = lower_bound(vertices.begin(), vertices.end(), vertex, greater<V>()); 
 	vertices.insert(it, vertex); 
 }
 
-bool DFS_sequential_search (vector<V> vertices, vector<int> &chosen, vector<vector<V>> &neighbors, unordered_set<State> &states, const int &BIN_GOAL) {
+bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector<V>> &neighbors, unordered_set<State> &states, const int &BIN_GOAL) {
 	if (chosen.size() >= BIN_GOAL) {
 		return true;
 	}
