@@ -5,7 +5,7 @@
 SAMPLES_PATH="samples"
 PROGRAM="solver" # only works for cpp so far
 
-# Default time-out time is 1s give argument to the tester if you want longer e.g. ./tester 10 if you want a 10 seconds time-out.
+# Default time-out time is 1s give argument to the tester if you want longer e.g. ./tester 5 if you want a 5 seconds time-out.
 [ -z "$1" ] && max_time="1" || max_time="$1"
 
 GREEN='\e[32m'
@@ -22,23 +22,15 @@ do
 	answer="$(cat < ${answer_file})"
 
 	output="`( time timeout ${max_time} ./${PROGRAM} < ${input} ) 2> temp_time_result`"
-	[[ "${output}" == "" ]] && output="ERROR\n"
-
 	time="$(cat temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
+
+	(( $(awk 'BEGIN {print ("'${time}'" >= "'${max_time}'")}') )) && time="${RED}${time}${NC}" && output="TIME-OUT"
+	[[ "${output}" == "" ]] && output="ERROR\t"
+	if [[ "${output}" == "${answer}" ]]; then output="${GREEN}${output}${NC}"; else output="${RED}${output}${NC}"; fi
+
 	input_file="$(echo "${input}" | sed 's/.*\///')"
 
-	if [[ "${output}" == "${answer}" ]]
-	then
-		echo -e "${input_file}\t${GREEN}${output}${NC}\t${answer}\t${time}"
-	else
-		if (( $(awk 'BEGIN {print ("'${time}'" >= "'${max_time}'")}') ))
-		then
-			output="TIME-OUT"
-			echo -e "${input_file}\t${RED}${output}\t${NC}${answer}\t${RED}${time}${NC}"
-		else
-			echo -e "${input_file}\t${RED}${output}\t${NC}${answer}\t${time}"
-		fi
-	fi
+	echo -e "${input_file}\t${output}\t${answer}\t${time}"
 done
 
 rm temp_time_result
