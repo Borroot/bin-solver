@@ -6,20 +6,13 @@
 
 using namespace std;
 
-struct V {
-	int label;
-	vector<int> neighbors;
-};
+typedef int V;
 
 struct State {
 	int current;
 	vector<int> vertices;
 	vector<int> chosen;
 };
-
-bool operator== (const V &vector, const int label) {
-	return vector.label == label;
-}
 
 bool operator== (const State &state1, const State &state2) {
 	return state1.current == state2.current && state1.vertices == state2.vertices && state1.chosen == state2.chosen;	
@@ -48,12 +41,11 @@ namespace std {
 	};
 }
 
-vector<V> init_vectors (const int &V_SIZE, const int &E_SIZE) {
-	vector<V> vertices;
+void init_vectors (vector<V> &vertices, vector<vector<V>> &neighbors, const int &V_SIZE, const int &E_SIZE) {
 
 	// Initialize vertices list.
 	for (int i = 0; i < V_SIZE; i++) {
-		vertices.push_back({i+1, {}});
+		vertices.push_back(i);
 	}
 
 	// Add neighbors to vertices.
@@ -61,40 +53,24 @@ vector<V> init_vectors (const int &V_SIZE, const int &E_SIZE) {
 		int v1, v2;
 		cin >> v1;
 		cin >> v2;
-		vertices[v1-1].neighbors.push_back(v2);
-		vertices[v2-1].neighbors.push_back(v1);
+		neighbors[v1-1].push_back(v2-1);
+		neighbors[v2-1].push_back(v1-1);
 	}
-
-	return vertices;
 }
 
 void remove_by_label (vector<V> &vertices, int label) {
 	vertices.erase(remove(vertices.begin(), vertices.end(), label), vertices.end());
 }
 
-vector<V> create_next_vertices (vector<V> &vertices, V current) {
+vector<V> create_next_vertices (vector<V> &vertices, vector<vector<V>> &neighbors, V current) {
 	vector<V> next_vertices(vertices);	
-	remove_by_label(next_vertices, current.label);
+	remove_by_label(next_vertices, current);
 
-	for (int i = 0; i < current.neighbors.size(); i++) {
-		remove_by_label(next_vertices, current.neighbors[i]);
+	for (int i = 0; i < neighbors[current].size(); i++) {
+		remove_by_label(next_vertices, neighbors[current][i]);
 	}
 
 	return next_vertices;
-}
-
-vector<int> labels (vector<V> vertices) {
-	vector<int> labels_vertices;
-
-	for (int i = 0; i < vertices.size(); i++) {
-		labels_vertices.push_back(vertices[i].label);
-	}
-	return labels_vertices;
-}
-
-State create_state (V &current, vector<V> &vertices, vector<int> &chosen) {
-	State state = {current.label, labels(vertices), chosen}; 
-	return state; 
 }
 
 void insert(vector<int> &vertices, int vertex) {
@@ -102,21 +78,20 @@ void insert(vector<int> &vertices, int vertex) {
 	vertices.insert(it, vertex); 
 }
 
-bool DFS_sequential_search (vector<V> vertices, vector<int> &chosen, unordered_set<State> &states, const int &BIN_GOAL) {
+bool DFS_sequential_search (vector<V> vertices, vector<int> &chosen, vector<vector<V>> &neighbors, unordered_set<State> &states, const int &BIN_GOAL) {
 	if (chosen.size() >= BIN_GOAL) {
 		return true;
 	}
-		
 	for (int i = 0; i < vertices.size(); i++) {
 		V current = vertices[i];
-		insert(chosen, current.label);
-		vector<V> next_vertices = create_next_vertices(vertices, current);
+		insert(chosen, current);
+		vector<V> next_vertices = create_next_vertices(vertices, neighbors, current);
 
-		State state = create_state(current, next_vertices, chosen);
+		State state = {current, next_vertices, chosen};
 		if (states.find(state) == states.end()) {
 			states.insert(state);
 
-			if (DFS_sequential_search(next_vertices, chosen, states, BIN_GOAL)) {
+			if (DFS_sequential_search(next_vertices, chosen, neighbors, states, BIN_GOAL)) {
 				return true;
 			}
 		} 
@@ -132,11 +107,15 @@ int main () {
 	cin >> V_SIZE;
 	cin >> BIN_GOAL;
 
-	vector<V> vertices = init_vectors(V_SIZE, E_SIZE);
-	vector<int> chosen;
+	vector<V> vertices;
+   	vector<vector<V>> neighbors(V_SIZE);
+
+	vector<V> chosen;
 	unordered_set<State> states;
 
-	bool result = DFS_sequential_search(vertices, chosen, states, BIN_GOAL);
+	init_vectors(vertices, neighbors, V_SIZE, E_SIZE);
+
+	bool result = DFS_sequential_search(vertices, chosen, neighbors, states, BIN_GOAL);
 	cout << (result ? "possible" : "impossible") << endl;
 
 	return 0;
