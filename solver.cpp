@@ -20,12 +20,12 @@ bool operator== (const State &state1, const State &state2) {
 
 namespace std {
 	template<> struct hash<vector<V>> {
-		size_t operator() (const vector<V> &vec) const noexcept {
-			size_t seed = vec.size();
-			for(auto& i : vec) {
-				seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+		size_t operator() (const vector<V> &vertices) const noexcept {
+			size_t seed = vertices.size();
+			for(int i = 0; i < vertices.size(); i++) {
+				seed += vertices[i] * 37;
 			}
-			return seed;
+			return hash<size_t>{}(seed);
 		}
 	};
 }
@@ -58,6 +58,11 @@ void init_vectors (vector<V> &vertices, vector<vector<V>> &neighbors, const int 
 	}
 }
 
+void insert(vector<V> &vertices, V vertex) {
+	vector<V>::iterator it = lower_bound(vertices.begin(), vertices.end(), vertex, greater<V>()); 
+	vertices.insert(it, vertex); 
+}
+
 void remove_vertex (vector<V> &vertices, V vertex) {
 	vertices.erase(remove(vertices.begin(), vertices.end(), vertex), vertices.end());
 }
@@ -70,11 +75,6 @@ vector<V> create_next_vertices (vector<V> &vertices, vector<vector<V>> &neighbor
 		remove_vertex(next_vertices, neighbors[current][i]);
 	}
 	return next_vertices;
-}
-
-void insert(vector<V> &vertices, V vertex) {
-	vector<V>::iterator it = lower_bound(vertices.begin(), vertices.end(), vertex, greater<V>()); 
-	vertices.insert(it, vertex); 
 }
 
 bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector<V>> &neighbors, unordered_set<State> &states, const int &BIN_GOAL) {
@@ -93,7 +93,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 			if (DFS_sequential_search(next_vertices, chosen, neighbors, states, BIN_GOAL)) {
 				return true;
 			}
-		} 
+		}
 		chosen.pop_back();
 	}		
 	return false;
