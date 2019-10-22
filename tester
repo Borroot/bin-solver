@@ -46,11 +46,11 @@ while true; do
 			SAMPLES_PATH="$2"
 			shift 2
 			;;
-        -d|--debug)
+		-d|--debug)
 			DEBUG=true
 			shift
 			;;
-        -m|--max-time)
+		-m|--max-time)
 			MAX_TIME="$2"
 			shift 2
 			;;
@@ -83,16 +83,18 @@ NORMAL=$(tput sgr0)
 
 # Start actual programs.
 echo -e "${BOLD}INPUT\t\tOUTPUT\t\tANSWER\t\tTIME (s)${NORMAL}"
+temp_time_result="$(mktemp)"
+
 for input in $(ls ${SAMPLES_PATH}/*.in) 
 do
 	answer_file="$(echo "${input}" | sed -r 's/in/out/g')"
 	answer="$(cat < ${answer_file})"
 
-	output="`( time timeout ${MAX_TIME} ${RUN}${PROGRAM} < ${input} 2>&1) 2> temp_time_result`"
+	output="`( time timeout ${MAX_TIME} ${RUN}${PROGRAM} < ${input} 2>&1) 2> ${temp_time_result}`"
 	stdout="$(echo "$output" | grep possible)"
 	stderr="$(echo "$output" | grep -v possible)"
 
-	time="$(cat temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
+	time="$(cat ${temp_time_result} | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
 
 	(( $(awk 'BEGIN {print ("'${time}'" >= "'${MAX_TIME}'")}') )) && time="${RED}${time}${NC}" && stdout="TIME-OUT"
 	[[ "${stdout}" == "" ]] && stdout="ERROR\t"
@@ -104,4 +106,4 @@ do
 	[[ "${DEBUG}" = true ]] && [[ "${stderr}" != "" ]] && echo -e "${DIM}${stderr}${NC}"
 done
 
-rm temp_time_result 
+rm -f ${temp_time_result}
