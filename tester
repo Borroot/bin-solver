@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # AUTHOR: Bram Pulles
 
-# TODO Support stderr before stdout.
-
 PROGRAM="solver" 
 SAMPLES_PATH="samples"
 
@@ -19,7 +17,8 @@ eval set -- "$PARSED"
 
 # help function.
 function help {
-	echo -e "Usage: $0 [OPTIONS...]\n
+	echo -e "
+Usage: $0 [OPTIONS...]\n
 This is an automatic testing tool for the algorithm and datastructures 
 practicum. This script currently supports programs written in C++.\n
 Options:
@@ -71,7 +70,6 @@ while true; do
 			;;
 	esac
 done
-
 
 # Colors and fonts.
 GREEN='\e[32m'
