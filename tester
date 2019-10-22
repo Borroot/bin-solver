@@ -7,9 +7,11 @@ SAMPLES_PATH="samples"
 MAX_TIME="1"
 DEBUG=false
 
+RUN="./"
+
 # Options for user input parsing.
-OPTIONS=p:s:dm:h
-LONGOPTS=program:,samples:,debug,max-time:,help
+OPTIONS=p:s:dm:hj
+LONGOPTS=program:,samples:,debug,max-time:,java,help
 PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
 eval set -- "$PARSED"
 
@@ -48,6 +50,10 @@ while true; do
 			MAX_TIME="$2"
 			shift 2
 			;;
+		-j|--java)
+			RUN="java "
+			shift
+			;;
 		-h|--help)
 			help
 			exit 0
@@ -79,7 +85,7 @@ do
 	answer_file="$(echo "${input}" | sed -r 's/in/out/g')"
 	answer="$(cat < ${answer_file})"
 
-	output="`( time timeout ${MAX_TIME} ./${PROGRAM} < ${input} 2>&1) 2> temp_time_result`"
+	output="`( time timeout ${MAX_TIME} ${RUN}${PROGRAM} < ${input} 2>&1) 2> temp_time_result`"
 	stdout="$(echo "$output" | sed -n 1p)"
 	stderr="$(echo "$output" | tail -n +2)"
 
