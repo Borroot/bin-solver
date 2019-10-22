@@ -86,9 +86,6 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 
 	for (int i = 0; i < vertices.size(); i++) {
 		total++;
-		if (total > 9000) {
-			return false;
-		}
 		V current = vertices[i];
 		insert(chosen, current);
 		vector<V> next_vertices = create_next_vertices(vertices, neighbors, current);
