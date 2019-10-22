@@ -6,6 +6,8 @@
 
 using namespace std;
 
+int pruned = 0, total = 0;
+
 typedef int V;
 
 struct State {
@@ -83,6 +85,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 	}
 
 	for (int i = 0; i < vertices.size(); i++) {
+		total++;
 		V current = vertices[i];
 		insert(chosen, current);
 		vector<V> next_vertices = create_next_vertices(vertices, neighbors, current);
@@ -94,7 +97,10 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 			if (DFS_sequential_search(next_vertices, chosen, neighbors, states, BIN_GOAL)) {
 				return true;
 			}
+		} else {
+			pruned++;
 		}
+
 		remove_vertex(chosen, current);
 	}		
 	return false;
@@ -117,6 +123,7 @@ int main () {
 
 	bool result = DFS_sequential_search(vertices, chosen, neighbors, states, BIN_GOAL);
 	cout << (result ? "possible" : "impossible") << endl;
+	cerr << "pruned: " << pruned << "\ttotal: " << total << "\trelative: " << (int)((pruned * 100.0f) / total) << "%" << endl; 
 
 	return 0;
 }
