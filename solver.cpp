@@ -86,7 +86,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 
 	for (int i = 0; i < vertices.size(); i++) {
 		total++;
-		if (total > 10000) {
+		if (total > 7000) {
 			return false;
 		}
 		V current = vertices[i];

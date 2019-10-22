@@ -89,8 +89,8 @@ do
 	answer="$(cat < ${answer_file})"
 
 	output="`( time timeout ${MAX_TIME} ${RUN}${PROGRAM} < ${input} 2>&1) 2> temp_time_result`"
-	stdout="$(echo "$output" | sed -n 1p)"
-	stderr="$(echo "$output" | tail -n +2)"
+	stdout="$(echo "$output" | grep possible)"
+	stderr="$(echo "$output" | grep -v possible)"
 
 	time="$(cat temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
 
