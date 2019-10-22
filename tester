@@ -25,6 +25,7 @@ Options:
   -s,--samples    - Specify the path to your samples folder
   -m,--max-time   - Specify the max time for your program trying to solve a case
   -d,--debug      - Show error messages (stderr)
+  -j,--java       - Run a Java solver
   -h,--help       - Show this help
 
 Written by Bram Pulles
