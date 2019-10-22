@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # AUTHOR: Bram Pulles
 
+# TODO Support stderr before stdout.
+
 PROGRAM="solver" 
 SAMPLES_PATH="samples"
 
