@@ -12,7 +12,9 @@ RUN="./"
 # Options for user input parsing.
 OPTIONS=p:s:dm:hj
 LONGOPTS=program:,samples:,debug,max-time:,java,help
+
 PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
+parsed_correctly=$?
 eval set -- "$PARSED"
 
 # help function.
@@ -34,6 +36,13 @@ Options:
 Written by Bram Pulles
 "
 }
+
+# If getopt gives a value then quit and show help.
+if [ $parsed_correctly -ne 0 ]
+then
+	help
+	exit $parsed_correctly
+fi
 
 # Parse options until '--'.
 while true; do 
