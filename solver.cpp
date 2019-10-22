@@ -81,6 +81,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 	if (chosen.size() >= BIN_GOAL) {
 		return true;
 	}
+
 	for (int i = 0; i < vertices.size(); i++) {
 		V current = vertices[i];
 		insert(chosen, current);
@@ -94,7 +95,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 				return true;
 			}
 		}
-		chosen.pop_back();
+		remove_vertex(chosen, current);
 	}		
 	return false;
 }
