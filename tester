@@ -91,28 +91,28 @@ BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
 # Start actual programs.
-echo -e "${BOLD}INPUT\t\tOUTPUT\t\tANSWER\t\tTIME (s)${NORMAL}"
+echo -e "${BOLD}INPUT\t\tOUTPUT\t\tANSWER\t\tTIME (s)$NORMAL"
 temp_time_result="$(mktemp)"
 
-for input in $(ls ${SAMPLES_PATH}/*.in) 
+for input in $(ls $SAMPLES_PATH/*.in) 
 do
-	answer_file="$(echo "${input}" | sed -r 's/in/out/g')"
-	answer="$(cat < ${answer_file})"
+	answer_file="$(echo "$input" | sed -r 's/in/out/g')"
+	answer="$(cat < $answer_file)"
 
-	output="`( time timeout ${MAX_TIME} ${RUN}${PROGRAM} < ${input} 2>&1) 2> ${temp_time_result}`"
+	output="`( time timeout $MAX_TIME $RUN$PROGRAM < $input 2>&1) 2> $temp_time_result`"
 	stdout="$(echo "$output" | grep possible)"
 	stderr="$(echo "$output" | grep -v possible)"
 
-	time="$(cat ${temp_time_result} | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
+	time="$(cat $temp_time_result | grep real | awk '{print $2}' | sed 's/.*m//' | tr -d s)"
 
-	(( $(awk 'BEGIN {print ("'${time}'" >= "'${MAX_TIME}'")}') )) && time="${RED}${time}${NC}" && stdout="TIME-OUT"
-	[[ "${stdout}" == "" ]] && stdout="ERROR\t"
-	if [[ "${stdout}" == "${answer}" ]]; then stdout="${GREEN}${stdout}${NC}"; else stdout="${RED}${stdout}${NC}"; fi
+	(( $(awk 'BEGIN {print ("'$time'" >= "'$MAX_TIME'")}') )) && time="$RED$time$NC" && stdout="TIME-OUT"
+	[[ "$stdout" == "" ]] && stdout="ERROR\t"
+	if [[ "$stdout" == "$answer" ]]; then stdout="$GREEN$stdout$NC"; else stdout="$RED$stdout$NC"; fi
 
-	input_file="$(echo "${input}" | sed 's/.*\///')"
+	input_file="$(echo "$input" | sed 's/.*\///')"
 
-	echo -e "${input_file}\t${stdout}\t${answer}\t${time}"
-	[[ "${DEBUG}" = true ]] && [[ "${stderr}" != "" ]] && echo -e "${DIM}${stderr}${NC}"
+	echo -e "$input_file\t$stdout\t$answer\t$time"
+	[[ "$DEBUG" = true ]] && [[ "$stderr" != "" ]] && echo -e "$DIM$stderr$NC"
 done
 
-rm -f ${temp_time_result}
+rm -f $temp_time_result
