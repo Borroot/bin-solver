@@ -1,0 +1,3 @@
+[submodule "bin-tester"]
+	path = bin-tester
+	url = https://github.com/borroot/bin-tester
