@@ -28,7 +28,7 @@ practicum. The script tries to run a C++ program by default.
 Options:
   -p,--program <path>    - Specify the path to your program
   -s,--samples <dir>     - Specify the path to your samples folder
-  -m,--max-time <value>  - Specify the max time for your program trying to solve a case
+  -m,--max-time <value>  - Specify the max time (s) to solve one case
   -d,--debug             - Show error messages (stderr)
   -j,--java              - Run a Java solver
   -h,--help              - Show this help
