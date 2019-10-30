@@ -1,5 +1,5 @@
-make: solver.cpp
-	g++ -o solver solver.cpp
+%: solver-%.cpp  
+	g++ -o solver $<
 
 java: Solver.java
 	javac Solver.java
