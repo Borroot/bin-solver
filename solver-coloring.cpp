@@ -31,12 +31,12 @@ void remove_vertex (vector<V> &vertices, const V vertex) {
 
 int highest (const vector<V> &colors) {
 	vector<int> counts(COLORS);
-	for (int i = 0; i < colors.size(); i++) {
+	for (int i = 0; i < (int)colors.size(); i++) {
 		counts[colors[i]]++;
 	}
 
 	int max = -1;
-	for (int i = 0; i < counts.size(); i++) {
+	for (int i = 0; i < (int)counts.size(); i++) {
 		if (counts[i] > max) {
 			max = counts[i];
 		}
@@ -50,7 +50,7 @@ int choose_color (const V &current, const vector<V> &colors, const vector<vector
 		legal_color[i] = true;
 	}
 
-	for (int i = 0; i < neighbors[current].size(); i++) {
+	for (int i = 0; i < (int)neighbors[current].size(); i++) {
 		legal_color[colors[neighbors[current][i]]] = false;
 	}
 

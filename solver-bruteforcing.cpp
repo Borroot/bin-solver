@@ -24,7 +24,7 @@ namespace std {
 	template<> struct hash<vector<V>> {
 		size_t operator() (const vector<V> &vertices) const noexcept {
 			size_t seed = vertices.size();
-			for(int i = 0; i < vertices.size(); i++) {
+			for(int i = 0; i < (int)vertices.size(); i++) {
 				seed += vertices[i] * 37;
 			}
 			return hash<size_t>{}(seed);
@@ -73,18 +73,18 @@ vector<V> create_next_vertices (vector<V> &vertices, vector<vector<V>> &neighbor
 	vector<V> next_vertices(vertices);	
 	remove_vertex(next_vertices, current);
 
-	for (int i = 0; i < neighbors[current].size(); i++) {
+	for (int i = 0; i < (int)neighbors[current].size(); i++) {
 		remove_vertex(next_vertices, neighbors[current][i]);
 	}
 	return next_vertices;
 }
 
 bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector<V>> &neighbors, unordered_set<State> &states, const int &BIN_GOAL) {
-	if (chosen.size() >= BIN_GOAL) {
+	if ((int)chosen.size() >= BIN_GOAL) {
 		return true;
 	}
 
-	for (int i = 0; i < vertices.size(); i++) {
+	for (int i = 0; i < (int)vertices.size(); i++) {
 		total++;
 		V current = vertices[i];
 		insert(chosen, current);

@@ -1,7 +1,9 @@
+CFLAGS=-Wall -Wextra -Werror -pedantic
+
 make: coloring
 
 %: solver-%.cpp  
-	g++ -o solver $<
+	g++ -o solver $< $(CFLAGS)
 
 java: Solver.java
 	javac Solver.java
