@@ -1,3 +1,5 @@
+make: coloring
+
 %: solver-%.cpp  
 	g++ -o solver $<
 
