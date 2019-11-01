@@ -3,10 +3,10 @@ CFLAGS=-Wall -Wextra -Werror -pedantic
 make: coloring
 
 %: solver-%.cpp  
-	g++ -o solver $< $(CFLAGS)
+	$(CXX) -o solver.o $< $(CFLAGS)
 
 java: Solver.java
 	javac Solver.java
 
 clean:
-	rm -f solver Solver.class
+	rm -f *.o *.class
