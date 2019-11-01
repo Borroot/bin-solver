@@ -2,6 +2,8 @@ CFLAGS=-Wall -Wextra -Werror -pedantic
 
 make: coloring
 
+all: coloring bruteforcing java
+
 %: solver-%.cpp  
 	$(CXX) -o solver.o $< $(CFLAGS)
 
