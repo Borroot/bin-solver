@@ -5,7 +5,7 @@ default: coloring
 all: coloring bruteforcing java
 
 %: solver-%.cpp  
-	$(CXX) -o solver.o $< $(CFLAGS)
+	$(CXX) -o $@.o $< $(CFLAGS)
 
 java: Solver.java
 	javac Solver.java
