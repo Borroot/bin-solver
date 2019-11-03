@@ -1,6 +1,6 @@
 CFLAGS=-Wall -Wextra -Werror -pedantic
 
-make: coloring
+default: coloring
 
 all: coloring bruteforcing java
 
