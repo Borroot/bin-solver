@@ -211,14 +211,20 @@ int main () {
 	unordered_set<State> states;
 
 	init_vectors(vertices, neighbors, V_SIZE, E_SIZE);
-	bubble_sort(vertices, neighbors);
-	int n = vertices.size();
-	filter(vertices, neighbors);
-	cerr << "Removed " << n - vertices.size() << " of total " << n << "." << endl;
 
+	int old_size = vertices.size();
+	// Filter out all vertices which will not be in the solution anyways.
+	filter(vertices, neighbors);
+	cerr << "Removed " << old_size - vertices.size() << " of total " << old_size << " vertices. "; 
+
+	// Sort the vertices from low degree to high degree for higher chances of finding the 'possible' tree.
+	bubble_sort(vertices, neighbors);
+
+	// Run DFS.
 	bool result = DFS_sequential_search(vertices, chosen, neighbors, states, BIN_GOAL);
+
 	cout << (result ? "possible" : "impossible") << endl;
-	cerr << "Pruned " << pruned << " of total " << total << "." << endl;
+	cerr << "Pruned " << pruned << " of total " << total << " amount of trees." << endl;
 
 	return 0;
 }
