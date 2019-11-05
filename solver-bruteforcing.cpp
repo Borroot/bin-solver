@@ -217,6 +217,12 @@ int main () {
 	filter(vertices, neighbors);
 	cerr << "Removed " << old_size - vertices.size() << " of total " << old_size << " vertices. "; 
 
+	// If there are less vertices left than our bin goal, well then it is impossible to place them.
+	if ((int)vertices.size() < BIN_GOAL) {
+		cout << "impossible" << endl;
+		return 0;
+	}
+
 	// Sort the vertices from low degree to high degree for higher chances of finding the 'possible' tree.
 	bubble_sort(vertices, neighbors);
 
