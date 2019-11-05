@@ -14,6 +14,18 @@ struct State {
 	vector<V> chosen;
 };
 
+ostream &operator << (ostream &out, vector<V> vertices) {
+	cerr << "[";
+	for (int i = 0; i < (int)vertices.size(); i++) {
+		cerr << vertices[i];
+		if (i != (int)vertices.size()-1) {
+			cerr << ",";
+		}
+	}
+	cerr << "]";
+	return out;
+}
+
 bool operator== (const State &state1, const State &state2) {
 	// Two states are equal if the current vertex, the vertices left and the vertices chosen are the same.
 	return state1.current == state2.current && state1.vertices == state2.vertices && state1.chosen == state2.chosen;	
