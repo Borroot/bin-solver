@@ -85,7 +85,7 @@ vector<V> create_next_vertices (vector<V> &vertices, vector<vector<V>> &neighbor
 	vector<V> next_vertices(vertices);	
 	remove_vertex(next_vertices, current);
 
-	// Create the list of the next vertices by removing the current and all of its neighbours.
+	// Create the list of the next vertices by removing the current and all of its neighbors.
 	for (int i = 0; i < (int)neighbors[current].size(); i++) {
 		remove_vertex(next_vertices, neighbors[current][i]);
 	}
@@ -119,6 +119,28 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 	return false;
 }
 
+void swap (V *vertex1, V *vertex2) {
+	V temp = *vertex1;
+	*vertex1 = *vertex2;
+	*vertex2 = temp;
+}
+
+void bubble_sort (vector<V> &vertices, vector<vector<V>> &neighbors) {
+	// Sort the vertices according to their degree, smallest to highest.
+	for (int i = 0; i < (int)vertices.size() - 1; i++) {
+		for (int j = 0; j < (int)vertices.size() - i - 1; j++) {
+			if (neighbors[vertices[j]].size() > neighbors[vertices[j+1]].size()) {
+				swap(&vertices[j], &vertices[j+1]);
+				cerr << "1";
+			}
+		}
+	}
+}
+
+void filter (vector<V> &vertices, vector<vector<V>> &neighbors) {
+
+}
+
 int main () {
 
 	int E_SIZE, V_SIZE, BIN_GOAL;
@@ -131,6 +153,8 @@ int main () {
 	unordered_set<State> states;
 
 	init_vectors(vertices, neighbors, V_SIZE, E_SIZE);
+	bubble_sort(vertices, neighbors);
+	filter(vertices, neighbors);
 
 	bool result = DFS_sequential_search(vertices, chosen, neighbors, states, BIN_GOAL);
 	cout << (result ? "possible" : "impossible") << endl;
