@@ -8,6 +8,8 @@ using namespace std;
 
 typedef int V;
 
+int pruned = 0, total = 0;
+
 struct State {
 	V current;
 	vector<V> vertices;
@@ -15,6 +17,7 @@ struct State {
 };
 
 ostream &operator << (ostream &out, vector<V> vertices) {
+	// Print a vector with vertices, this is just for debugging purposes.
 	cerr << "[";
 	for (int i = 0; i < (int)vertices.size(); i++) {
 		cerr << vertices[i];
@@ -104,6 +107,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 		insert(chosen, current);
 		vector<V> next_vertices = create_next_vertices(vertices, neighbors, current);
 
+		total++;
 		// Only continue the DFS if the current state is not already explored.
 		State state = {current, next_vertices, chosen};
 		if (states.find(state) == states.end()) {
@@ -112,6 +116,8 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 			if (DFS_sequential_search(next_vertices, chosen, neighbors, states, BIN_GOAL)) {
 				return true;
 			}
+		} else {
+			pruned++;
 		}
 
 		remove_vertex(chosen, current);
@@ -120,6 +126,7 @@ bool DFS_sequential_search (vector<V> vertices, vector<V> &chosen, vector<vector
 }
 
 void swap (V *vertex1, V *vertex2) {
+	// Swap the two vertices, used in the bubble sort.
 	V temp = *vertex1;
 	*vertex1 = *vertex2;
 	*vertex2 = temp;
@@ -137,12 +144,14 @@ void bubble_sort (vector<V> &vertices, const vector<vector<V>> &neighbors) {
 }
 
 void remove_edges (const V &vertex, vector<vector<V>> &neighbors) {
+	// Remove all the references to vertex inside of the neighbors from other vertices.
 	for (int i = 0; i < (int)neighbors.size(); i++) {
 		remove_vertex(neighbors[i], vertex);
 	}
 }
 
 bool subset (const vector<V> &vertices1, const vector<V> &vertices2) {
+	// Determine whether vertices1 is a subset of vertices2.
 	for (int i = 0; i < (int)vertices1.size(); i++) {
 		bool found = false;;
 
@@ -151,7 +160,6 @@ bool subset (const vector<V> &vertices1, const vector<V> &vertices2) {
 				found = true;
 			}
 		}
-
 		if (!found) {
 			return false;
 		}
@@ -160,11 +168,20 @@ bool subset (const vector<V> &vertices1, const vector<V> &vertices2) {
 }
 
 void filter (vector<V> &vertices, vector<vector<V>> &neighbors) {
-	bool found = false;
+	// Here we filter out vertices based on the following criteria:
+	// if the neighbors of the current vertex are a subset of the 
+	// neighbors of a neighbor of the current vertex then remove this
+	// neighbor from the vertices left. This can be done since we 
+	// know that it is always more beneficial to choose the current
+	// vertex instead of this particular neighbor. 
+	bool found;
 
 	do {
-		for (int i = 0; i < (int)vertices.size(); i++) {
+		found = false;
+
+		for (int i = 0; i < (int)vertices.size() && !found; i++) {
 			V current = vertices[i];
+
 			for (int j = 0; j < (int)neighbors[current].size(); j++) {
 				V neighbor = neighbors[current][j];
 				remove_vertex(neighbors[current], neighbor);
@@ -172,6 +189,8 @@ void filter (vector<V> &vertices, vector<vector<V>> &neighbors) {
 				if (subset(neighbors[current], neighbors[neighbor])) {
 					remove_edges(neighbor, neighbors);	
 					remove_vertex(vertices, neighbor);
+
+					found = true;
 				} else {
 					neighbors[current].push_back(neighbor);
 				}
@@ -195,10 +214,11 @@ int main () {
 	bubble_sort(vertices, neighbors);
 	int n = vertices.size();
 	filter(vertices, neighbors);
-	cerr << "Removed " << n - vertices.size() << " of total " << n << endl;
+	cerr << "Removed " << n - vertices.size() << " of total " << n << "." << endl;
 
 	bool result = DFS_sequential_search(vertices, chosen, neighbors, states, BIN_GOAL);
 	cout << (result ? "possible" : "impossible") << endl;
+	cerr << "Pruned " << pruned << " of total " << total << "." << endl;
 
 	return 0;
 }
