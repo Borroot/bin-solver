@@ -125,20 +125,59 @@ void swap (V *vertex1, V *vertex2) {
 	*vertex2 = temp;
 }
 
-void bubble_sort (vector<V> &vertices, vector<vector<V>> &neighbors) {
+void bubble_sort (vector<V> &vertices, const vector<vector<V>> &neighbors) {
 	// Sort the vertices according to their degree, smallest to highest.
 	for (int i = 0; i < (int)vertices.size() - 1; i++) {
 		for (int j = 0; j < (int)vertices.size() - i - 1; j++) {
 			if (neighbors[vertices[j]].size() > neighbors[vertices[j+1]].size()) {
 				swap(&vertices[j], &vertices[j+1]);
-				cerr << "1";
 			}
 		}
 	}
 }
 
-void filter (vector<V> &vertices, vector<vector<V>> &neighbors) {
+void remove_edges (const V &vertex, vector<vector<V>> &neighbors) {
+	for (int i = 0; i < (int)neighbors.size(); i++) {
+		remove_vertex(neighbors[i], vertex);
+	}
+}
 
+bool subset (const vector<V> &vertices1, const vector<V> &vertices2) {
+	for (int i = 0; i < (int)vertices1.size(); i++) {
+		bool found = false;;
+
+		for (int j = 0; !found && j < (int)vertices2.size(); j++) {
+			if (vertices1[i] == vertices2[j]) {
+				found = true;
+			}
+		}
+
+		if (!found) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void filter (vector<V> &vertices, vector<vector<V>> &neighbors) {
+	bool found = false;
+
+	do {
+		for (int i = 0; i < (int)vertices.size(); i++) {
+			V current = vertices[i];
+			for (int j = 0; j < (int)neighbors[current].size(); j++) {
+				V neighbor = neighbors[current][j];
+				remove_vertex(neighbors[current], neighbor);
+
+				if (subset(neighbors[current], neighbors[neighbor])) {
+					remove_edges(neighbor, neighbors);	
+					remove_vertex(vertices, neighbor);
+				} else {
+					neighbors[current].push_back(neighbor);
+				}
+			}
+		}
+	} while (found);
 }
 
 int main () {
@@ -154,7 +193,9 @@ int main () {
 
 	init_vectors(vertices, neighbors, V_SIZE, E_SIZE);
 	bubble_sort(vertices, neighbors);
+	int n = vertices.size();
 	filter(vertices, neighbors);
+	cerr << "Removed " << n - vertices.size() << " of total " << n << endl;
 
 	bool result = DFS_sequential_search(vertices, chosen, neighbors, states, BIN_GOAL);
 	cout << (result ? "possible" : "impossible") << endl;
