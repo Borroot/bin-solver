@@ -7,9 +7,7 @@ using namespace std;
 vector<int> input () {
 	int E_SIZE, V_SIZE, BIN_GOAL;
 	
-	cin >> E_SIZE;
-	cin >> V_SIZE;
-	cin >> BIN_GOAL;
+	cin >> E_SIZE >> V_SIZE >> BIN_GOAL;
 
 	vector<int> values;
 
@@ -19,8 +17,7 @@ vector<int> input () {
 
 	for (int i = 0; i < E_SIZE; i++) {
 		int v1, v2;
-		cin >> v1;
-		cin >> v2;
+		cin >> v1 >> v2;
 		values.push_back(v1);
 		values.push_back(v2);
 	}
