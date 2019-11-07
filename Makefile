@@ -1,14 +1,20 @@
-CFLAGS=-Wall -Wextra -Werror -pedantic
+SOLVERS_DIR=    solvers
+SRC_DIR=        src
+INC_DIR=        inc
 
-default: coloring
+SOLVERS_FILES=  $(wildcard $(SOLVERS_DIR)/*.cpp)
+SRC_FILES=      $(wildcard $(SRC_DIR)/*.cpp)
+INC_FILES=      $(wildcard $(INC_DIR)/*.h)
 
-all: coloring bruteforcing hardcoded java
+CFLAGS=         -Wall -Wextra -Werror -pedantic
+IFLAGS=         -I $(INC_DIR)
 
-%: solver-%.cpp  
-	$(CXX) -o $@.o $< $(CFLAGS)
+#all: $(SOLVERS_FILES:.cpp=)
 
-java: Solver.java
-	javac Solver.java
+%: $(SOLVERS_DIR)/%.cpp $(SRC_FILES)
+	$(CXX) -o $@.o $^ $(CFLAGS) $(IFLAGS)
 
 clean:
-	rm -f *.o *.class
+	rm -f *.o
+
+.PHONY: all clean

@@ -26,7 +26,7 @@ vector<int> input () {
 }
 
 string answer (int hash) {
-	string answer = "impossible"
+	string answer = "impossible";
 
 	switch (hash) {
 		case 659:	answer="impossible";	break;
