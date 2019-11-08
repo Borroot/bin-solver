@@ -1,23 +1,32 @@
-SOLVERS_DIR=    solvers
-SRC_DIR=        src
-INC_DIR=        inc
+SRC=        src
+INC=        inc
+OBJ=        obj
 
-SOLVERS_FILES=  $(wildcard $(SOLVERS_DIR)/*.cpp)
-SRC_FILES=      $(wildcard $(SRC_DIR)/*.cpp)
-INC_FILES=      $(wildcard $(INC_DIR)/*.h)
+CFLAGS=     -Wall -Wextra -Werror -pedantic
+IFLAGS=     -I $(INC)
 
-SOLVERS_BASES=  $(basename $(SOLVERS_FILES))
-SOLVERS_NAMES=  $(SOLVERS_BASES:$(SOLVERS_DIR)/%=%)
+NAMES=      color brute hardc
 
-CFLAGS=         -Wall -Wextra -Werror -pedantic
-IFLAGS=         -I $(INC_DIR)
+COLOR_OBJ_FILES=$(OBJ)/coloring.o $(OBJ)/init_vectors.o $(OBJ)/filter.o $(OBJ)/remove_vertex.o
+BRUTE_OBJ_FILES=$(OBJ)/bruteforcing.o $(OBJ)/init_vectors.o $(OBJ)/filter.o $(OBJ)/remove_vertex.o
+HARDC_OBJ_FILES=$(OBJ)/hardcoded.o
 
-all: $(SOLVERS_NAMES)
+all: $(NAMES)
 
-%: $(SOLVERS_DIR)/%.cpp $(SRC_FILES)
-	$(CXX) -o $@.o $^ $(CFLAGS) $(IFLAGS)
+color: $(COLOR_OBJ_FILES)
+	$(CXX) -o $@ $^ $(CFLAGS) $(IFLAGS)
+
+brute: $(BRUTE_OBJ_FILES)
+	$(CXX) -o $@ $^ $(CFLAGS) $(IFLAGS)
+
+hardc: $(HARDC_OBJ_FILES)
+	$(CXX) -o $@ $^ $(CFLAGS) $(IFLAGS)
+
+$(OBJ)/%.o: $(SRC)/%.cpp
+	mkdir -p obj
+	$(CXX) -o $@ -c $< $(CFLAGS) $(IFLAGS)
 
 clean:
-	rm -f *.o
+	rm -rf obj $(NAMES)
 
 .PHONY: all clean
