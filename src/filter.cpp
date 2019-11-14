@@ -1,7 +1,6 @@
 #include <vector>
 
 #include "vertex.h"
-#include "init_vectors.h"
 #include "remove_vertex.h"
 
 using namespace std;
