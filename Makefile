@@ -2,7 +2,7 @@ SRC=        src
 INC=        inc
 OBJ=        obj
 
-CFLAGS=     -Wall -Wextra -Werror -pedantic
+CFLAGS=     -Wall -Wextra -Werror -pedantic -O3
 IFLAGS=     -I $(INC)
 
 NAMES=      color brute hardc
